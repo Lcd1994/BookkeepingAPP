@@ -49,7 +49,14 @@ public class MainActivity extends AppCompatActivity {
         adapter.setOnTransactionClickListener(new TransactionAdapter.OnTransactionClickListener() {
             @Override
             public void onTransactionClick(Transaction transaction) {
-                // 可以添加编辑功能
+                Intent intent = new Intent(MainActivity.this, AddTransactionActivity.class);
+                intent.putExtra("transaction_id", transaction.getId());
+                intent.putExtra("amount", transaction.getAmount());
+                intent.putExtra("type", transaction.getType());
+                intent.putExtra("category", transaction.getCategory());
+                intent.putExtra("note", transaction.getNote());
+                intent.putExtra("timestamp", transaction.getTimestamp());
+                startActivity(intent);
             }
             
             @Override

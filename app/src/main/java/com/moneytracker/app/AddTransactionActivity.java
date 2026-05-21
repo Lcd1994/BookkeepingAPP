@@ -1,6 +1,7 @@
 package com.moneytracker.app;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -24,12 +25,16 @@ public class AddTransactionActivity extends AppCompatActivity {
     private int transactionType = Transaction.TYPE_EXPENSE;
     private String selectedCategory = null;
     private long selectedTimestamp = System.currentTimeMillis();
+    private boolean isEditMode = false;
+    private long editTransactionId = -1;
     
     private EditText amountEditText;
     private EditText noteEditText;
     private TextView dateTextView;
+    private TextView titleTextView;
     private RecyclerView categoryRecyclerView;
     private CategoryAdapter categoryAdapter;
+    private Button saveButton;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +46,50 @@ public class AddTransactionActivity extends AppCompatActivity {
         dateTextView = findViewById(R.id.dateTextView);
         categoryRecyclerView = findViewById(R.id.categoryRecyclerView);
         TabLayout typeTabLayout = findViewById(R.id.typeTabLayout);
-        Button saveButton = findViewById(R.id.saveButton);
+        saveButton = findViewById(R.id.saveButton);
         View backButton = findViewById(R.id.backButton);
+        titleTextView = findViewById(R.id.titleTextView);
+        
+        Button btnAmount10 = findViewById(R.id.btnAmount10);
+        Button btnAmount50 = findViewById(R.id.btnAmount50);
+        Button btnAmount100 = findViewById(R.id.btnAmount100);
+        Button btnAmount500 = findViewById(R.id.btnAmount500);
+        
+        btnAmount10.setOnClickListener(v -> {
+            String current = amountEditText.getText().toString();
+            if (current.isEmpty()) {
+                amountEditText.setText("10");
+            } else {
+                amountEditText.setText(String.valueOf(Double.parseDouble(current) + 10));
+            }
+        });
+        
+        btnAmount50.setOnClickListener(v -> {
+            String current = amountEditText.getText().toString();
+            if (current.isEmpty()) {
+                amountEditText.setText("50");
+            } else {
+                amountEditText.setText(String.valueOf(Double.parseDouble(current) + 50));
+            }
+        });
+        
+        btnAmount100.setOnClickListener(v -> {
+            String current = amountEditText.getText().toString();
+            if (current.isEmpty()) {
+                amountEditText.setText("100");
+            } else {
+                amountEditText.setText(String.valueOf(Double.parseDouble(current) + 100));
+            }
+        });
+        
+        btnAmount500.setOnClickListener(v -> {
+            String current = amountEditText.getText().toString();
+            if (current.isEmpty()) {
+                amountEditText.setText("500");
+            } else {
+                amountEditText.setText(String.valueOf(Double.parseDouble(current) + 500));
+            }
+        });
         
         backButton.setOnClickListener(v -> finish());
         
@@ -67,6 +114,32 @@ public class AddTransactionActivity extends AppCompatActivity {
             public void onTabReselected(TabLayout.Tab tab) {
             }
         });
+        
+        Intent intent = getIntent();
+        if (intent.hasExtra("transaction_id")) {
+            isEditMode = true;
+            editTransactionId = intent.getLongExtra("transaction_id", -1);
+            double amount = intent.getDoubleExtra("amount", 0);
+            int type = intent.getIntExtra("type", Transaction.TYPE_EXPENSE);
+            String category = intent.getStringExtra("category");
+            String note = intent.getStringExtra("note", "");
+            long timestamp = intent.getLongExtra("timestamp", System.currentTimeMillis());
+            
+            amountEditText.setText(String.valueOf(amount));
+            noteEditText.setText(note);
+            selectedCategory = category;
+            selectedTimestamp = timestamp;
+            
+            if (type == Transaction.TYPE_EXPENSE) {
+                typeTabLayout.getTabAt(0).select();
+            } else {
+                typeTabLayout.getTabAt(1).select();
+            }
+            
+            titleTextView.setText("编辑记录");
+            saveButton.setText("更新");
+            updateDateDisplay();
+        }
         
         saveButton.setOnClickListener(v -> saveTransaction());
     }
@@ -93,11 +166,29 @@ public class AddTransactionActivity extends AppCompatActivity {
             categories.add("教育");
             categories.add("医疗");
             categories.add("住房");
+            categories.add("通讯");
+            categories.add("日用品");
+            categories.add("美容");
+            categories.add("运动");
+            categories.add("零食");
+            categories.add("饮品");
+            categories.add("服装");
+            categories.add("数码");
+            categories.add("礼物");
+            categories.add("旅游");
+            categories.add("咖啡");
+            categories.add("电影");
+            categories.add("书籍");
+            categories.add("保险");
             categories.add("其他");
         } else {
             categories.add("工资");
             categories.add("奖金");
             categories.add("投资");
+            categories.add("理财");
+            categories.add("兼职");
+            categories.add("红包");
+            categories.add("退款");
             categories.add("其他");
         }
         categoryAdapter = new CategoryAdapter(categories);
@@ -105,6 +196,10 @@ public class AddTransactionActivity extends AppCompatActivity {
         categoryAdapter.setOnCategoryClickListener(category -> {
             selectedCategory = category;
         });
+        
+        if (selectedCategory != null) {
+            categoryAdapter.setSelectedCategory(selectedCategory);
+        }
     }
     
     private void showDatePicker() {
@@ -158,11 +253,19 @@ public class AddTransactionActivity extends AppCompatActivity {
         
         String note = noteEditText.getText().toString().trim();
         
-        Transaction transaction = new Transaction(transactionType, amount, selectedCategory, note, selectedTimestamp);
         DatabaseHelper databaseHelper = new DatabaseHelper(this);
-        databaseHelper.insertTransaction(transaction);
         
-        Toast.makeText(this, "记录已保存", Toast.LENGTH_SHORT).show();
+        if (isEditMode) {
+            Transaction transaction = new Transaction(transactionType, amount, selectedCategory, note, selectedTimestamp);
+            transaction.setId(editTransactionId);
+            databaseHelper.updateTransaction(transaction);
+            Toast.makeText(this, "记录已更新", Toast.LENGTH_SHORT).show();
+        } else {
+            Transaction transaction = new Transaction(transactionType, amount, selectedCategory, note, selectedTimestamp);
+            databaseHelper.insertTransaction(transaction);
+            Toast.makeText(this, "记录已保存", Toast.LENGTH_SHORT).show();
+        }
+        
         finish();
     }
 }

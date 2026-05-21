@@ -27,6 +27,16 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
     public void setOnCategoryClickListener(OnCategoryClickListener listener) {
         this.listener = listener;
     }
+    
+    public void setSelectedCategory(String category) {
+        int position = categories.indexOf(category);
+        if (position >= 0) {
+            int previousPosition = selectedPosition;
+            selectedPosition = position;
+            notifyItemChanged(previousPosition);
+            notifyItemChanged(selectedPosition);
+        }
+    }
 
     @NonNull
     @Override
@@ -68,9 +78,27 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
             case "教育": return "📚";
             case "医疗": return "🏥";
             case "住房": return "🏠";
+            case "通讯": return "📱";
+            case "日用品": return "🧴";
+            case "美容": return "💄";
+            case "运动": return "⚽";
+            case "零食": return "🍪";
+            case "饮品": return "☕";
+            case "服装": return "👔";
+            case "数码": return "💻";
+            case "礼物": return "🎁";
+            case "旅游": return "✈️";
+            case "咖啡": return "☕";
+            case "电影": return "🎬";
+            case "书籍": return "📖";
+            case "保险": return "🛡️";
             case "工资": return "💰";
-            case "奖金": return "🎁";
+            case "奖金": return "🎉";
             case "投资": return "📈";
+            case "理财": return "💹";
+            case "兼职": return "💼";
+            case "红包": return "🧧";
+            case "退款": return "↩️";
             default: return "💳";
         }
     }

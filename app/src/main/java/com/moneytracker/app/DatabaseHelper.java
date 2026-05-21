@@ -149,6 +149,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.close();
         return rowsDeleted;
     }
+    
+    public int updateTransaction(Transaction transaction) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_TYPE, transaction.getType());
+        values.put(COLUMN_AMOUNT, transaction.getAmount());
+        values.put(COLUMN_CATEGORY, transaction.getCategory());
+        values.put(COLUMN_NOTE, transaction.getNote());
+        values.put(COLUMN_TIMESTAMP, transaction.getTimestamp());
+        
+        int rowsUpdated = db.update(TABLE_TRANSACTIONS, values, COLUMN_ID + " = ?",
+                new String[]{String.valueOf(transaction.getId())});
+        db.close();
+        return rowsUpdated;
+    }
 
     public static class CategorySummary {
         private String category;
