@@ -106,7 +106,7 @@ fi
 
 # For Darwin, add options to specify how the application appears in the dock
 if $darwin; then
-    GRADLE_OPTS="$GRADLE_OPTS \"-Xdock:name=$APP_NAME\" \"-Xdock:icon=$APP_HOME/media/gradle.icns\""
+    GRADLE_OPTS="$GRADLE_OPTS "\"-Xdock:name=$APP_NAME\"" "-Xdock:icon=$APP_HOME/media/gradle.icns\"
 fi
 
 # For Cygwin or MSYS, switch paths to Windows format before running java
@@ -133,9 +133,9 @@ if [ "$cygwin" = "true" -o "$msys" = "true" ] ; then
         CHECK=`echo "$arg"|egrep -c "$OURCYGPATTERN" -`
         CHECK2=`echo "$arg"|egrep -c "^-"`                                 ### Annoying!
         if [ $CHECK -ne 0 ] && [ $CHECK2 -eq 0 ] ; then                    ### Annoying!
-            eval `echo args$i`=`cygpath --path --ignore --mixed "$arg"`
+            eval `echo args$i=`cygpath --path --ignore --mixed "$arg"`
         else
-            eval `echo args$i`="\"$arg\""
+            eval `echo args$i=`\'"$arg"\'`
         fi
         i=`expr $i + 1`
     done
